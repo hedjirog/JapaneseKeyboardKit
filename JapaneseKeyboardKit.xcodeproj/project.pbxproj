@@ -17,10 +17,10 @@
 		14E6570C19D823FD00A74B85 /* KeyboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6570B19D823FD00A74B85 /* KeyboardViewController.m */; };
 		14E6570F19D823FD00A74B85 /* JPKB.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 14E6570619D823FD00A74B85 /* JPKB.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		14E6571819D8244C00A74B85 /* KeyboardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6571719D8244C00A74B85 /* KeyboardView.m */; };
-		14E6571B19D825A700A74B85 /* KanaInputEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14E6571A19D825A700A74B85 /* KanaInputEngine.mm */; };
+		14E6571B19D825A700A74B85 /* KanaInputEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6571A19D825A700A74B85 /* KanaInputEngine.m */; };
 		14E6571E19D8261A00A74B85 /* KeyboardCandidateBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6571D19D8261A00A74B85 /* KeyboardCandidateBar.m */; };
 		14E6572119D8278E00A74B85 /* KeyboardLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6572019D8278E00A74B85 /* KeyboardLayout.m */; };
-		14E6572419D828E400A74B85 /* InputManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14E6572319D828E400A74B85 /* InputManager.mm */; };
+		14E6572419D828E400A74B85 /* InputManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6572319D828E400A74B85 /* InputManager.m */; };
 		14E6572719D82A0E00A74B85 /* KeyboardButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E6572619D82A0E00A74B85 /* KeyboardButton.m */; };
 		14E6572919D82DBF00A74B85 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14E656E919D8239100A74B85 /* Images.xcassets */; };
 		14E6572B19D82DD600A74B85 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14E6572A19D82DD600A74B85 /* Images.xcassets */; };
@@ -79,13 +79,13 @@
 		14E6571619D8244C00A74B85 /* KeyboardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardView.h; sourceTree = "<group>"; };
 		14E6571719D8244C00A74B85 /* KeyboardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardView.m; sourceTree = "<group>"; };
 		14E6571919D825A700A74B85 /* KanaInputEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KanaInputEngine.h; sourceTree = "<group>"; };
-		14E6571A19D825A700A74B85 /* KanaInputEngine.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KanaInputEngine.mm; sourceTree = "<group>"; };
+		14E6571A19D825A700A74B85 /* KanaInputEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KanaInputEngine.m; sourceTree = "<group>"; };
 		14E6571C19D8261A00A74B85 /* KeyboardCandidateBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardCandidateBar.h; sourceTree = "<group>"; };
 		14E6571D19D8261A00A74B85 /* KeyboardCandidateBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardCandidateBar.m; sourceTree = "<group>"; };
 		14E6571F19D8278E00A74B85 /* KeyboardLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardLayout.h; sourceTree = "<group>"; };
 		14E6572019D8278E00A74B85 /* KeyboardLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardLayout.m; sourceTree = "<group>"; };
 		14E6572219D828E400A74B85 /* InputManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputManager.h; sourceTree = "<group>"; };
-		14E6572319D828E400A74B85 /* InputManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputManager.mm; sourceTree = "<group>"; };
+		14E6572319D828E400A74B85 /* InputManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InputManager.m; sourceTree = "<group>"; };
 		14E6572519D82A0E00A74B85 /* KeyboardButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardButton.h; sourceTree = "<group>"; };
 		14E6572619D82A0E00A74B85 /* KeyboardButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardButton.m; sourceTree = "<group>"; };
 		14E6572A19D82DD600A74B85 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -170,9 +170,9 @@
 				14E6571F19D8278E00A74B85 /* KeyboardLayout.h */,
 				14E6572019D8278E00A74B85 /* KeyboardLayout.m */,
 				14E6571919D825A700A74B85 /* KanaInputEngine.h */,
-				14E6571A19D825A700A74B85 /* KanaInputEngine.mm */,
+				14E6571A19D825A700A74B85 /* KanaInputEngine.m */,
 				14E6572219D828E400A74B85 /* InputManager.h */,
-				14E6572319D828E400A74B85 /* InputManager.mm */,
+				14E6572319D828E400A74B85 /* InputManager.m */,
 				14E6572C19D830C600A74B85 /* InputCandidate.h */,
 				14E6572D19D830C600A74B85 /* InputCandidate.m */,
 				14E6572A19D82DD600A74B85 /* Images.xcassets */,
@@ -302,12 +302,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14E6572419D828E400A74B85 /* InputManager.mm in Sources */,
+				14E6572419D828E400A74B85 /* InputManager.m in Sources */,
 				14E6572719D82A0E00A74B85 /* KeyboardButton.m in Sources */,
 				14E6571E19D8261A00A74B85 /* KeyboardCandidateBar.m in Sources */,
 				14A11AB919D84A6F00FA1350 /* KeyboardCandidateBarCell.m in Sources */,
 				14E6572119D8278E00A74B85 /* KeyboardLayout.m in Sources */,
-				14E6571B19D825A700A74B85 /* KanaInputEngine.mm in Sources */,
+				14E6571B19D825A700A74B85 /* KanaInputEngine.m in Sources */,
 				14E6570C19D823FD00A74B85 /* KeyboardViewController.m in Sources */,
 				14E6571819D8244C00A74B85 /* KeyboardView.m in Sources */,
 				14E6572E19D830C600A74B85 /* InputCandidate.m in Sources */,
