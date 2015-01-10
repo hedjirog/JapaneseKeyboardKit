@@ -8,92 +8,6 @@
 
 #import "KanaInputEngine.h"
 
-#if !TARGET_IPHONE_SIMULATOR
-#define USE_MOZC 1
-#endif
-
-#if USE_MOZC
-
-#include <iostream>
-#include <string>
-
-using namespace std;
-
-#include "composer/composer.h"
-
-#include "base/flags.h"
-#include "base/scoped_ptr.h"
-#include "composer/composition_interface.h"
-#include "composer/table.h"
-#include "session/commands.pb.h"
-#include "transliteration/transliteration.h"
-
-@interface KanaInputEngine ()
-
-@property (nonatomic) NSMutableString *proccessedText;
-@property (nonatomic) NSMutableString *displayText;
-
-@end
-
-@implementation KanaInputEngine {
-    mozc::composer::Table table;
-    mozc::composer::Composer *composer;
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.proccessedText = [[NSMutableString alloc] init];
-        self.displayText = [[NSMutableString alloc] init];
-        
-        const char kDefaultPreeditTableFile[] = "system://romanji-hiragana.tsv";
-        table.LoadFromFile(kDefaultPreeditTableFile);
-        
-        composer = new mozc::composer::Composer(&table, &mozc::commands::Request::default_instance());
-    }
-    return self;
-}
-
-- (void)dealloc
-{
-    delete composer;
-}
-
-- (void)insertCharacter:(NSString *)input
-{
-    if (_shifted) {
-        input = input.uppercaseString;
-    } else {
-        input = input.lowercaseString;
-    }
-    
-    composer->InsertCharacter(input.UTF8String);
-    string output;
-    composer->GetStringForPreedit(&output);
-    
-    _proccessedText.string = [NSString stringWithUTF8String:output.c_str()];
-    _displayText.string = _proccessedText.copy;
-    
-    [self.delegate keyboardInputEngine:self processedText:_proccessedText.copy displayText:_displayText.copy];
-}
-
-- (void)backspace
-{
-    composer->Backspace();
-    [self.delegate keyboardInputEngine:self processedText:_proccessedText.copy displayText:_displayText.copy];
-}
-
-- (void)setText:(NSString *)text
-{
-    composer->Reset();
-    composer->InsertCharacter(text.UTF8String);
-}
-
-@end
-
-#else
-
 @interface KanaInputEngine ()
 
 @property (nonatomic) NSMutableString *proccessedText;
@@ -162,5 +76,3 @@ using namespace std;
 }
 
 @end
-
-#endif
