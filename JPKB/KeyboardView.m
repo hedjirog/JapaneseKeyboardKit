@@ -7,6 +7,7 @@
 //
 
 #import "KeyboardView.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 #import "KeyboardButton.h"
 #import "KeyboardCandidateBar.h"
 #import "KanaInputEngine.h"
@@ -97,6 +98,7 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
         self.markedText = @"";
         
         [self setupKeyboardLayout];
+        [self setupEventSubscribers];
     }
     
     return self;
@@ -231,10 +233,47 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 
 #pragma mark -
 
-- (void)setupEventHandlers:(UIButton *)button
+- (void)setupEventSubscribers
 {
-    [button addTarget:self action:@selector(buttonDidTouchDown:) forControlEvents:UIControlEventTouchDown];
-    [button addTarget:self action:@selector(buttonDidTouchUp:) forControlEvents:UIControlEventTouchUpInside];
+    RACSignal *kanaInputSignal = [self kanaInputSignal];
+    RACSignal *nonKanaInputSignal = [self nonKanaInputSignal];
+    
+    [kanaInputSignal subscribeNext:^(NSString *input) {
+        [self.inputEngine insertCharacter:input];
+    }];
+    
+    [nonKanaInputSignal subscribeNext:^(NSString *input) {
+        [self.delegate keyboardView:self didAcceptCandidate:input];
+    }];
+    
+    [[RACSignal merge:@[kanaInputSignal, nonKanaInputSignal]] subscribeNext:^(NSString *input) {
+        [self resetShift];
+    }];
+}
+
+- (RACSignal *)kanaInputSignal
+{
+    RACSignal *signal = [self rac_signalForSelector:@selector(buttonDidTouchDown:)];
+    return [[[signal reduceEach:^(KeyboardButton *button){
+        return button;
+    }] filter:^BOOL(KeyboardButton *button) {
+        return button.keyIndex < KeyboardButtonIndexNextKeyboard && self.inputMode == KeyboardInputModeKana;
+    }] map:^(KeyboardButton *button) {
+        NSString *input = [button titleForState:UIControlStateNormal];
+        return (self.shifted) ? input.uppercaseString : input.lowercaseString;
+    }];
+}
+
+- (RACSignal *)nonKanaInputSignal
+{
+    RACSignal *signal = [self rac_signalForSelector:@selector(buttonDidTouchDown:)];
+    return [[[signal reduceEach:^(KeyboardButton *button){
+        return button;
+    }] filter:^BOOL(KeyboardButton *button) {
+        return button.keyIndex < KeyboardButtonIndexNextKeyboard && self.inputMode != KeyboardInputModeKana;
+    }] map:^(KeyboardButton *button) {
+        return [button titleForState:UIControlStateNormal];
+    }];
 }
 
 #pragma mark -
@@ -262,51 +301,41 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 - (void)buttonDidTouchDown:(KeyboardButton *)button
 {
     KeyboardButtonIndex keyIndex = button.keyIndex;
-    if (keyIndex < KeyboardButtonIndexNextKeyboard) {
-        NSString *input = [button titleForState:UIControlStateNormal];
-        if (self.inputMode == KeyboardInputModeKana) {
-            [self.inputEngine insertCharacter:input];
-        } else {
-            [self.delegate keyboardView:self didAcceptCandidate:input];
-        }
-        [self resetShift];
-    } else {
-        switch (keyIndex) {
-            case KeyboardButtonIndexToggleInputMode:
-                [self handleToggleInputMode];
-                break;
-                
-            case KeyboardButtonIndexShift:
-                [self handleShift];
-                break;
-                
-            case KeyboardButtonIndexSpace:
-                [self handleSpace];
-                break;
-                
-            case KeyboardButtonIndexComma:
-                [self handleComma];
-                break;
-                
-            case KeyboardButtonIndexPeriod:
-                [self handlePeriod];
-                break;
-                
-            case KeyboardButtonIndexDelete:
-                [self handleDelete];
-                break;
-                
-            case KeyboardButtonIndexPreviousCursor:
-                [self.delegate keyboardViewBackCursor:self];
-                break;
-                
-            case KeyboardButtonIndexNextCursor:
-                [self.delegate keyboardViewForwardCursor:self];
-                break;
-                
-            default:
-                break;
-        }
+    switch (keyIndex) {
+        case KeyboardButtonIndexToggleInputMode:
+            [self handleToggleInputMode];
+            break;
+            
+        case KeyboardButtonIndexShift:
+            [self handleShift];
+            break;
+            
+        case KeyboardButtonIndexSpace:
+            [self handleSpace];
+            break;
+            
+        case KeyboardButtonIndexComma:
+            [self handleComma];
+            break;
+            
+        case KeyboardButtonIndexPeriod:
+            [self handlePeriod];
+            break;
+            
+        case KeyboardButtonIndexDelete:
+            [self handleDelete];
+            break;
+            
+        case KeyboardButtonIndexPreviousCursor:
+            [self.delegate keyboardViewBackCursor:self];
+            break;
+            
+        case KeyboardButtonIndexNextCursor:
+            [self.delegate keyboardViewForwardCursor:self];
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -445,7 +474,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 - (void)setShifted:(BOOL)shifted
 {
     _shifted = shifted;
-    self.inputEngine.shifted = shifted;
     self.keyboardLayout.shifted = shifted;
 }
 
@@ -453,7 +481,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 {
     _shiftLocked = shiftLocked;
     _shifted = shiftLocked;
-    self.inputEngine.shifted = shiftLocked;
     self.keyboardLayout.shiftLocked = shiftLocked;
 }
 

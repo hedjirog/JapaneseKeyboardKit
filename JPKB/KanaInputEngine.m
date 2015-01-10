@@ -29,12 +29,6 @@
 
 - (void)insertCharacter:(NSString *)input
 {
-    if (_shifted) {
-        input = input.uppercaseString;
-    } else {
-        input = input.lowercaseString;
-    }
-    
     if ([input compare:@"A" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
         [input compare:@"I" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
         [input compare:@"U" options:NSCaseInsensitiveSearch] == NSOrderedSame ||

@@ -13,7 +13,6 @@
 
 @property (nonatomic, weak) id delegate;
 
-@property (nonatomic) BOOL shifted;
 @property (nonatomic) NSString *text;
 
 - (void)insertCharacter:(NSString *)input;
