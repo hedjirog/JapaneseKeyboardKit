@@ -16,25 +16,10 @@ typedef NS_ENUM(NSUInteger, KeyboardMetrics) {
 };
 
 typedef NS_ENUM(NSUInteger, KeyboardButtonIndex) {
-    KeyboardButtonIndexNextKeyboard = 40,
-    KeyboardButtonIndexToggleInputMode,
-    KeyboardButtonIndexShift,
+    KeyboardButtonIndexShift = 41,
     KeyboardButtonIndexSpace,
-    KeyboardButtonIndexComma,
-    KeyboardButtonIndexPeriod,
     KeyboardButtonIndexDelete,
     KeyboardButtonIndexReturn,
-    KeyboardButtonIndexDismiss,
-    KeyboardButtonIndexPreviousCandidate,
-    KeyboardButtonIndexNextCandidate,
-    KeyboardButtonIndexPreviousCursor,
-    KeyboardButtonIndexNextCursor,
-};
-
-typedef NS_ENUM(NSInteger, KeyboardInputMode) {
-    KeyboardInputModeKana,
-    KeyboardInputModeAlphabet,
-    KeyboardInputModeNumberPunctual,
 };
 
 @class KeyboardButton;
@@ -42,10 +27,8 @@ typedef NS_ENUM(NSInteger, KeyboardInputMode) {
 @interface KeyboardLayout : NSObject
 
 @property (nonatomic) KeyboardMetrics metrics;
-@property (nonatomic) KeyboardInputMode inputMode;
 
 @property (nonatomic) BOOL shifted;
-@property (nonatomic) BOOL shiftLocked;
 
 + (KeyboardLayout *)keyboardLayout;
 - (void)setupKeyboardButtonsWithView:(UIView *)view;

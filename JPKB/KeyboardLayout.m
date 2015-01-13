@@ -15,44 +15,24 @@
 @property (nonatomic) NSArray *inputButtons;
 @property (nonatomic) NSArray *functionButtons;
 
-@property (nonatomic) KeyboardButton *nextKeyboardButton;
-@property (nonatomic) KeyboardButton *toggleInputModeButton;
 @property (nonatomic) KeyboardButton *shiftButton;
 @property (nonatomic) KeyboardButton *spaceButton;
-@property (nonatomic) KeyboardButton *commaButton;
-@property (nonatomic) KeyboardButton *periodButton;
 @property (nonatomic) KeyboardButton *deleteButton;
 @property (nonatomic) KeyboardButton *returnButton;
-@property (nonatomic) KeyboardButton *dismissButton;
-@property (nonatomic) KeyboardButton *previousCandidateButton;
-@property (nonatomic) KeyboardButton *nextCandidateButton;
-@property (nonatomic) KeyboardButton *previousCursorButton;
-@property (nonatomic) KeyboardButton *nextCursorButton;
 
 @property (nonatomic) NSArray *keycaps;
 @property (nonatomic) UIFont *buttonTitleFont;
 
-@property (nonatomic) UIImage *nextKeyboardImage;
 @property (nonatomic) UIImage *shiftImage;
 @property (nonatomic) UIImage *highlightedShiftImage;
 @property (nonatomic) UIImage *shiftLockImage;
 @property (nonatomic) UIImage *deleteImage;
 @property (nonatomic) UIImage *returnImage;
-@property (nonatomic) UIImage *dismissImage;
 
-@property (nonatomic) CGRect nextKeyboardButtonFrame;
-@property (nonatomic) CGRect toggleInputModeButtonFrame;
 @property (nonatomic) CGRect shiftButtonFrame;
 @property (nonatomic) CGRect spaceButtonFrame;
-@property (nonatomic) CGRect commaButtonFrame;
-@property (nonatomic) CGRect periodButtonFrame;
 @property (nonatomic) CGRect deleteButtonFrame;
 @property (nonatomic) CGRect returnButtonFrame;
-@property (nonatomic) CGRect dismissButtonFrame;
-@property (nonatomic) CGRect previousCandidateButtonFrame;
-@property (nonatomic) CGRect nextCandidateButtonFrame;
-@property (nonatomic) CGRect previousCursorButtonFrame;
-@property (nonatomic) CGRect nextCursorButtonFrame;
 
 @end
 
@@ -107,19 +87,6 @@
     KeyboardButton *button;
     
     button = [self darkgrayButtonWithTitle:nil image:nil];
-    button.keyIndex = KeyboardButtonIndexNextKeyboard;
-    [functionButtons addObject:button];
-    self.nextKeyboardButton = button;
-    
-    button = [self darkgrayButtonWithTitle:@"123" image:nil];
-    [button setTitle:@"ABC" forState:UIControlStateSelected];
-    [button setTitle:@"ABC" forState:UIControlStateHighlighted | UIControlStateSelected];
-    [button setBackgroundImage:[UIImage imageNamed:@"key_white"] forState:UIControlStateHighlighted | UIControlStateSelected];
-    button.keyIndex = KeyboardButtonIndexToggleInputMode;
-    [functionButtons addObject:button];
-    self.toggleInputModeButton = button;
-    
-    button = [self darkgrayButtonWithTitle:nil image:nil];
     [button setBackgroundImage:[UIImage imageNamed:@"key_white"] forState:UIControlStateSelected];
     [button setBackgroundImage:[UIImage imageNamed:@"key_white"] forState:UIControlStateHighlighted | UIControlStateSelected];
     button.keyIndex = KeyboardButtonIndexShift;
@@ -131,16 +98,6 @@
     [functionButtons addObject:button];
     self.spaceButton = button;
     
-    button = [self whiteButtonWithTitle:NSLocalizedString(@",", nil) image:nil];
-    button.keyIndex = KeyboardButtonIndexComma;
-    [functionButtons addObject:button];
-    self.commaButton = button;
-    
-    button = [self whiteButtonWithTitle:NSLocalizedString(@".", nil) image:nil];
-    button.keyIndex = KeyboardButtonIndexPeriod;
-    [functionButtons addObject:button];
-    self.periodButton = button;
-    
     button = [self darkgrayButtonWithTitle:nil image:nil];
     button.keyIndex = KeyboardButtonIndexDelete;
     [functionButtons addObject:button];
@@ -150,31 +107,6 @@
     button.keyIndex = KeyboardButtonIndexReturn;
     [functionButtons addObject:button];
     self.returnButton = button;
-    
-    button = [self darkgrayButtonWithTitle:nil image:nil];
-    button.keyIndex = KeyboardButtonIndexDismiss;
-    [functionButtons addObject:button];
-    self.dismissButton = button;
-    
-    button = [self darkgrayButtonWithTitle:@"前候補" image:nil];
-    button.keyIndex = KeyboardButtonIndexPreviousCandidate;
-    [functionButtons addObject:button];
-    self.previousCandidateButton = button;
-    
-    button = [self darkgrayButtonWithTitle:@"次候補" image:nil];
-    button.keyIndex = KeyboardButtonIndexNextCandidate;
-    [functionButtons addObject:button];
-    self.nextCandidateButton = button;
-    
-    button = [self darkgrayButtonWithTitle:@"＜" image:nil];
-    button.keyIndex = KeyboardButtonIndexPreviousCursor;
-    [functionButtons addObject:button];
-    self.previousCursorButton = button;
-    
-    button = [self darkgrayButtonWithTitle:@"＞" image:nil];
-    button.keyIndex = KeyboardButtonIndexNextCursor;
-    [functionButtons addObject:button];
-    self.nextCursorButton = button;
     
     self.functionButtons = functionButtons;
 }
@@ -187,8 +119,6 @@
         [button addTarget:view action:@selector(buttonDidTouchUp:) forControlEvents:UIControlEventTouchUpInside];
         [view addSubview:button];
     }
-    
-    [self.shiftButton addTarget:view action:@selector(buttonDidTouchDownRepeat:) forControlEvents:UIControlEventTouchDownRepeat];
 }
 
 #pragma mark -
@@ -209,8 +139,6 @@
             index++;
         }
     }
-    
-    self.toggleInputModeButton.selected = self.inputMode == KeyboardInputModeNumberPunctual;
 }
 
 - (CGRect)inputButtonFrameForRow:(NSInteger)row column:(NSInteger)column
@@ -242,32 +170,16 @@
         }
     }
     
-    self.nextKeyboardButton.frame = self.nextKeyboardButtonFrame;
-    [self.nextKeyboardButton setImage:self.nextKeyboardImage forState:UIControlStateNormal];
-    
-    self.toggleInputModeButton.frame = self.toggleInputModeButtonFrame;
-    
     self.shiftButton.frame = self.shiftButtonFrame;
     [self.shiftButton setImage:self.shiftImage forState:UIControlStateNormal];
     
     self.spaceButton.frame = self.spaceButtonFrame;
-    self.commaButton.frame = self.commaButtonFrame;
-    self.periodButton.frame = self.periodButtonFrame;
     
     self.deleteButton.frame = self.deleteButtonFrame;
     [self.deleteButton setImage:self.deleteImage forState:UIControlStateNormal];
     
     self.returnButton.frame = self.returnButtonFrame;
     [self.returnButton setImage:self.returnImage forState:UIControlStateNormal];
-    
-    self.dismissButton.frame = self.dismissButtonFrame;
-    [self.dismissButton setImage:self.dismissImage forState:UIControlStateNormal];
-    
-    self.previousCandidateButton.frame = self.previousCandidateButtonFrame;
-    self.nextCandidateButton.frame = self.nextCandidateButtonFrame;
-    
-    self.previousCursorButton.frame = self.previousCursorButtonFrame;
-    self.nextCursorButton.frame = self.nextCursorButtonFrame;
     
     for (KeyboardButton *button in self.functionButtons) {
         button.hidden = CGRectIsEmpty(button.frame);
@@ -277,12 +189,7 @@
 
 - (void)updateShiftButton
 {
-    if (self.shiftLocked) {
-        self.shiftButton.selected = YES;
-        [self.shiftButton setImage:self.shiftLockImage forState:UIControlStateNormal];
-        [self.shiftButton setImage:self.shiftLockImage forState:UIControlStateSelected];
-        [self.shiftButton setImage:self.shiftLockImage forState:UIControlStateHighlighted | UIControlStateSelected];
-    } else if (self.shifted) {
+    if (self.shifted) {
         self.shiftButton.selected = YES;
         [self.shiftButton setImage:self.shiftImage forState:UIControlStateNormal];
         [self.shiftButton setImage:self.highlightedShiftImage forState:UIControlStateSelected];
@@ -304,24 +211,9 @@
     [self updateButtonLayout];
 }
 
-- (void)setInputMode:(KeyboardInputMode)inputMode
-{
-    _inputMode = inputMode;
-    [self updateKeycaps];
-}
-
 - (void)setShifted:(BOOL)shifted
 {
     _shifted = shifted;
-    [self updateShiftButton];
-}
-
-- (void)setShiftLocked:(BOOL)shiftLocked
-{
-    _shiftLocked = shiftLocked;
-    if (!shiftLocked) {
-        _shifted = NO;
-    }
     [self updateShiftButton];
 }
 
@@ -330,15 +222,6 @@
 - (UIFont *)buttonTitleFont
 {
     return [UIFont fontWithName:@"HiraKakuProN-W3" size:16.0];;
-}
-
-- (UIImage *)nextKeyboardImage
-{
-    if (self.metrics == KeyboardMetricsDefault) {
-        return [UIImage imageNamed:@"global_portrait_phone"];
-    } else {
-        return [UIImage imageNamed:@"global_landscape_phone"];
-    }
 }
 
 - (UIImage *)shiftImage
@@ -382,11 +265,6 @@
     return [UIImage imageNamed:@"return_phone"];
 }
 
-- (UIImage *)dismissImage
-{
-    return [UIImage imageNamed:@"dismiss_landscape_phone"];
-}
-
 #pragma mark -
 
 - (NSArray *)keycaps
@@ -399,20 +277,8 @@
                      @[@[@"Z"], @[@"X"], @[@"C"], @[@"V"], @[@"B"], @[@"N"], @[@"M"]],
                      ];
     }
-    static NSArray *numberPunctual;
-    if (!numberPunctual) {
-        numberPunctual = @[
-                           @[@[@"1"], @[@"2"], @[@"3"], @[@"4"], @[@"5"], @[@"6"], @[@"7"], @[@"8"], @[@"9"], @[@"0"]],
-                           @[@[@"-"], @[@"/"], @[@":"], @[@";"], @[@"("], @[@")"], @[@"¥"], @[@"&"], @[@"@"]],
-                           @[@[@"."], @[@","], @[@"?"], @[@"!"], @[@"'"], @[@"["], @[@"]"]],
-                           ];
-    }
     
-    if (self.inputMode == KeyboardInputModeKana) {
-        return alphabet;
-    } else {
-        return numberPunctual;
-    }
+    return alphabet;
 }
 
 #pragma mark -
@@ -516,55 +382,27 @@
         CGFloat width = 45.5;
         CGFloat height = 55.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(width, top + height * 3, width, height);
         self.shiftButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
         self.spaceButtonFrame = CGRectMake(width * 2, top + height * 3, width * 2, height);
-        self.commaButtonFrame = CGRectMake(width * 4, top + height * 3, width, height);
-        self.periodButtonFrame = CGRectMake(width * 5, top + height * 3, width, height);
         self.deleteButtonFrame = CGRectMake(width * 6, top + height * 2, width, height);
         self.returnButtonFrame = CGRectMake(width * 6, top + height * 3, width, height);
-        self.previousCandidateButtonFrame = CGRectZero;
-        self.nextCandidateButtonFrame = CGRectZero;
-        self.previousCursorButtonFrame = CGRectZero;
-        self.nextCursorButtonFrame = CGRectZero;
-        self.dismissButtonFrame = CGRectZero;
     } else if (self.metrics == KeyboardMetricsLandscape568) {
         CGFloat top = 30.0;
-        CGFloat width = 58.0;
         CGFloat height = 41.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(56.0, top + height * 3, 84.0, height);
         self.shiftButtonFrame = CGRectMake(0.0, top + height * 2, 84.0, height);
         self.spaceButtonFrame = CGRectMake(139.5, top + height * 3, 56.0 * 4 + 1.5, height);
-        self.commaButtonFrame = CGRectMake(141.0 + 56.0 * 4, top + height * 3, width, height);
-        self.periodButtonFrame = CGRectMake(142.0 + 56.0 * 5, top + height * 3, width, height);
         self.deleteButtonFrame = CGRectMake(87.0 + 56.0 * 7, top + height * 2, 86.0, height);
         self.returnButtonFrame = CGRectMake(87.0 + 56.0 * 7, top + height * 3, 86.0, height);
-        self.previousCandidateButtonFrame = CGRectZero;
-        self.nextCandidateButtonFrame = CGRectZero;
-        self.previousCursorButtonFrame = CGRectZero;
-        self.nextCursorButtonFrame = CGRectZero;
-        self.dismissButtonFrame = CGRectZero;
     } else {
         CGFloat top = 30.0;
         CGFloat width = 48.0;
         CGFloat height = 41.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(width, top + height * 3, width, height);
         self.shiftButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
         self.spaceButtonFrame = CGRectMake(width * 2, top + height * 3, width * 5, height);
-        self.commaButtonFrame = CGRectMake(width * 7, top + height * 3, width, height);
-        self.periodButtonFrame = CGRectMake(width * 8, top + height * 3, width, height);
         self.deleteButtonFrame = CGRectMake(width * 9, top + height * 2, width, height);
         self.returnButtonFrame = CGRectMake(width * 9, top + height * 3, width, height);
-        self.previousCandidateButtonFrame = CGRectZero;
-        self.nextCandidateButtonFrame = CGRectZero;
-        self.previousCursorButtonFrame = CGRectZero;
-        self.nextCursorButtonFrame = CGRectZero;
-        self.dismissButtonFrame = CGRectZero;
     }
 }
 
@@ -606,39 +444,19 @@
         CGFloat width = 47.0;
         CGFloat height = 55.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(width, top + height * 3, width, height);
         self.shiftButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
         self.spaceButtonFrame = CGRectMake(width * 2, top + height * 3, width * 3, height);
-        self.commaButtonFrame = CGRectMake(width * 5, top + height * 3, width, height);
-        self.periodButtonFrame = CGRectMake(width * 6, top + height * 3, width, height);
         self.deleteButtonFrame = CGRectMake(width * 7, top + height * 2, width, height);
         self.returnButtonFrame = CGRectMake(width * 7, top + height * 3, width, height);
-        self.previousCandidateButtonFrame = CGRectZero;
-        self.nextCandidateButtonFrame = CGRectZero;
-        self.previousCursorButtonFrame = CGRectZero;
-        self.nextCursorButtonFrame = CGRectZero;
-        self.dismissButtonFrame = CGRectZero;
     } else {
         CGFloat top = 30.0;
         CGFloat left = 139.5;
-        CGFloat width = 58.0;
         CGFloat height = 41.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(56.0, top + height * 3, 84.0, height);
         self.shiftButtonFrame = CGRectMake(56.0, top + height * 2, 84.0, height);
         self.spaceButtonFrame = CGRectMake(left, top + height * 3, 55.5 * 6, height);
-        self.commaButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
-        self.periodButtonFrame = CGRectMake(54.0 + 55.5 * 10, top + height * 2, width, height);
         self.deleteButtonFrame = CGRectMake(139.0 + 55.5 * 7, top + height * 2, 82.0, height);
         self.returnButtonFrame = CGRectMake(left + 55.5 * 6, top + height * 3, 111.0, height);
-        self.dismissButtonFrame = CGRectZero;
-        self.previousCandidateButtonFrame = CGRectMake(0.0, top, width, height);
-        self.nextCandidateButtonFrame = CGRectMake(0.0, top + height, width, height);
-        self.previousCursorButtonFrame = CGRectMake(54.0 + 55.5 * 10, top, width, height);
-        self.nextCursorButtonFrame = CGRectMake(54.0 + 55.5 * 10, top + height, width, height);
-        self.dismissButtonFrame = CGRectMake(left + 55.5 * 8, top + height * 3, 84.0, height);
     }
 }
 
@@ -680,39 +498,20 @@
         CGFloat width = 51.7;
         CGFloat height = 57.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(width, top + height * 3, width, height);
         self.shiftButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
         self.spaceButtonFrame = CGRectMake(width * 2, top + height * 3, width * 3, height);
-        self.commaButtonFrame = CGRectMake(width * 5, top + height * 3, width, height);
-        self.periodButtonFrame = CGRectMake(width * 6, top + height * 3, width, height);
         self.deleteButtonFrame = CGRectMake(width * 7, top + height * 2, width, height);
         self.returnButtonFrame = CGRectMake(width * 7, top + height * 3, width, height);
-        self.previousCandidateButtonFrame = CGRectZero;
-        self.nextCandidateButtonFrame = CGRectZero;
-        self.previousCursorButtonFrame = CGRectZero;
-        self.nextCursorButtonFrame = CGRectZero;
-        self.dismissButtonFrame = CGRectZero;
     } else {
         CGFloat top = 30.0;
         CGFloat left = 152.5;
         CGFloat width = 61.0;
         CGFloat height = 41.0;
         
-        self.toggleInputModeButtonFrame = CGRectMake(0.0, top + height * 3, width, height);
-        self.nextKeyboardButtonFrame = CGRectMake(width, top + height * 3, 92.0, height);
         self.shiftButtonFrame = CGRectMake(width, top + height * 2, 92.0, height);
         self.spaceButtonFrame = CGRectMake(left, top + height * 3, width * 7, height);
-        self.commaButtonFrame = CGRectMake(0.0, top + height * 2, width, height);
-        self.periodButtonFrame = CGRectMake(width * 11, top + height * 2, width, height);
         self.deleteButtonFrame = CGRectMake(left + width * 7, top + height * 2, 92.0, height);
         self.returnButtonFrame = CGRectMake(left + width * 7, top + height * 3, 92.0, height);
-        self.dismissButtonFrame = CGRectZero;
-        self.previousCandidateButtonFrame = CGRectMake(0.0, top, width, height);
-        self.nextCandidateButtonFrame = CGRectMake(0.0, top + height, width, height);
-        self.previousCursorButtonFrame = CGRectMake(width * 11, top, width, height);
-        self.nextCursorButtonFrame = CGRectMake(width * 11, top + height, width, height);
-        self.dismissButtonFrame = CGRectMake(width * 11, top + height * 3, width, height);
     }
 }
 

@@ -166,16 +166,6 @@
 
 #pragma mark -
 
-- (void)keyboardViewShouldAdvanceToNextInputMode:(KeyboardView *)keyboardView
-{
-    [self advanceToNextInputMode];
-}
-
-- (void)keyboardViewShouldDismiss:(KeyboardView *)keyboardView
-{
-    [self dismissKeyboard];
-}
-
 - (void)keyboardViewDidInputDelete:(KeyboardView *)keyboardView
 {
     [self.textDocumentProxy deleteBackward];
@@ -184,16 +174,6 @@
 - (void)keyboardViewDidInputReturn:(KeyboardView *)keyboardView
 {
     [self.textDocumentProxy insertText:@"\n"];
-}
-
-- (void)keyboardViewBackCursor:(KeyboardView *)keyboardView
-{
-    [self.textDocumentProxy adjustTextPositionByCharacterOffset:-1];
-}
-
-- (void)keyboardViewForwardCursor:(KeyboardView *)keyboardView
-{
-    [self.textDocumentProxy adjustTextPositionByCharacterOffset:1];
 }
 
 - (void)keyboardView:(KeyboardView *)keyboardView didAcceptCandidate:(NSString *)candidate

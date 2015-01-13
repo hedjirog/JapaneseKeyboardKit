@@ -14,22 +14,16 @@
 @interface KeyboardView : UIView
 
 @property (nonatomic, weak) id delegate;
-@property (nonatomic) KeyboardInputMode inputMode;
 
 - (void)buttonDidTouchDown:(KeyboardButton *)button;
 - (void)buttonDidTouchUp:(KeyboardButton *)button;
-- (void)buttonDidTouchDownRepeat:(KeyboardButton *)button;
 
 @end
 
 @protocol KeyboardViewDelegate <NSObject>
 
-- (void)keyboardViewShouldAdvanceToNextInputMode:(KeyboardView *)keyboardView;
-- (void)keyboardViewShouldDismiss:(KeyboardView *)keyboardView;
 - (void)keyboardViewDidInputDelete:(KeyboardView *)keyboardView;
 - (void)keyboardViewDidInputReturn:(KeyboardView *)keyboardView;
-- (void)keyboardViewBackCursor:(KeyboardView *)keyboardView;
-- (void)keyboardViewForwardCursor:(KeyboardView *)keyboardView;
 - (void)keyboardView:(KeyboardView *)keyboardView didAcceptCandidate:(NSString *)candidate;
 
 @end

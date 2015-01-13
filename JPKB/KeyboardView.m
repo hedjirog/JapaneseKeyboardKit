@@ -39,7 +39,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 @property (nonatomic) KeyboardSize keyboardSize;
 
 @property (nonatomic) BOOL shifted;
-@property (nonatomic) BOOL shiftLocked;
 
 @property (nonatomic) NSString *markedText;
 @property (nonatomic) UILabel *markedTextLabel;
@@ -141,8 +140,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
         case KeyboardSizeUnknown:
             break;
     }
-    
-    self.keyboardLayout.inputMode = self.inputMode;
 }
 
 - (void)updateKeyboardLayout
@@ -236,17 +233,9 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 - (void)setupEventSubscribers
 {
     RACSignal *kanaInputSignal = [self kanaInputSignal];
-    RACSignal *nonKanaInputSignal = [self nonKanaInputSignal];
     
     [kanaInputSignal subscribeNext:^(NSString *input) {
         [self.inputEngine insertCharacter:input];
-    }];
-    
-    [nonKanaInputSignal subscribeNext:^(NSString *input) {
-        [self.delegate keyboardView:self didAcceptCandidate:input];
-    }];
-    
-    [[RACSignal merge:@[kanaInputSignal, nonKanaInputSignal]] subscribeNext:^(NSString *input) {
         [self resetShift];
     }];
 }
@@ -257,32 +246,14 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
     return [[[signal reduceEach:^(KeyboardButton *button){
         return button;
     }] filter:^BOOL(KeyboardButton *button) {
-        return button.keyIndex < KeyboardButtonIndexNextKeyboard && self.inputMode == KeyboardInputModeKana;
+        return button.keyIndex < KeyboardButtonIndexShift;
     }] map:^(KeyboardButton *button) {
         NSString *input = [button titleForState:UIControlStateNormal];
         return (self.shifted) ? input.uppercaseString : input.lowercaseString;
     }];
 }
 
-- (RACSignal *)nonKanaInputSignal
-{
-    RACSignal *signal = [self rac_signalForSelector:@selector(buttonDidTouchDown:)];
-    return [[[signal reduceEach:^(KeyboardButton *button){
-        return button;
-    }] filter:^BOOL(KeyboardButton *button) {
-        return button.keyIndex < KeyboardButtonIndexNextKeyboard && self.inputMode != KeyboardInputModeKana;
-    }] map:^(KeyboardButton *button) {
-        return [button titleForState:UIControlStateNormal];
-    }];
-}
-
 #pragma mark -
-
-- (void)setInputMode:(KeyboardInputMode)inputMode
-{
-    _inputMode = inputMode;
-    self.keyboardLayout.inputMode = inputMode;
-}
 
 - (void)setMarkedText:(NSString *)markedText
 {
@@ -302,10 +273,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 {
     KeyboardButtonIndex keyIndex = button.keyIndex;
     switch (keyIndex) {
-        case KeyboardButtonIndexToggleInputMode:
-            [self handleToggleInputMode];
-            break;
-            
         case KeyboardButtonIndexShift:
             [self handleShift];
             break;
@@ -314,24 +281,8 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
             [self handleSpace];
             break;
             
-        case KeyboardButtonIndexComma:
-            [self handleComma];
-            break;
-            
-        case KeyboardButtonIndexPeriod:
-            [self handlePeriod];
-            break;
-            
         case KeyboardButtonIndexDelete:
             [self handleDelete];
-            break;
-            
-        case KeyboardButtonIndexPreviousCursor:
-            [self.delegate keyboardViewBackCursor:self];
-            break;
-            
-        case KeyboardButtonIndexNextCursor:
-            [self.delegate keyboardViewForwardCursor:self];
             break;
             
         default:
@@ -343,52 +294,12 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 {
     KeyboardButtonIndex keyIndex = button.keyIndex;
     switch (keyIndex) {
-        case KeyboardButtonIndexNextKeyboard:
-            [self acceptCurrentCandidate];
-            [self.delegate keyboardViewShouldAdvanceToNextInputMode:self];
-            break;
-            
         case KeyboardButtonIndexReturn:
             [self handleReturn];
             break;
-            
-        case KeyboardButtonIndexDismiss:
-            [self.delegate keyboardViewShouldDismiss:self];
-            [self resetShift];
-            break;
-            
-        case KeyboardButtonIndexPreviousCandidate:
-            [self.candidateBar selectPreviousCandidate];
-            break;
-            
-        case KeyboardButtonIndexNextCandidate:
-            [self.candidateBar selectNextCandidate];
-            break;
-            
+                        
         default:
             break;
-    }
-}
-
-- (void)buttonDidTouchDownRepeat:(KeyboardButton *)button
-{
-    KeyboardButtonIndex keyIndex = button.keyIndex;
-    switch (keyIndex) {
-        case KeyboardButtonIndexShift:
-            [self handleShiftLock];
-            break;
-            
-        default:
-            break;
-    }
-}
-
-- (void)handleToggleInputMode
-{
-    if (self.inputMode == KeyboardInputModeKana) {
-        self.inputMode = KeyboardInputModeNumberPunctual;
-    } else {
-        self.inputMode = KeyboardInputModeKana;
     }
 }
 
@@ -400,24 +311,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
         [self.delegate keyboardView:self didAcceptCandidate:@" "];
     } else {
         [self.candidateBar selectNextCandidate];
-    }
-}
-
-- (void)handleComma
-{
-    if (self.inputMode == KeyboardInputModeKana) {
-        [self.inputEngine insertCharacter:@"、"];
-    } else {
-        [self.delegate keyboardView:self didAcceptCandidate:@","];
-    }
-}
-
-- (void)handlePeriod
-{
-    if (self.inputMode == KeyboardInputModeKana) {
-        [self.inputEngine insertCharacter:@"。"];
-    } else {
-        [self.delegate keyboardView:self didAcceptCandidate:@"."];
     }
 }
 
@@ -450,23 +343,12 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 
 - (void)handleShift
 {
-    if (self.shiftLocked) {
-        self.shiftLocked = NO;
-    } else {
-        self.shifted = !self.shifted;
-    }
-}
-
-- (void)handleShiftLock
-{
-    self.shiftLocked = !self.shiftLocked;
+    self.shifted = !self.shifted;
 }
 
 - (void)resetShift
 {
-    if (!self.shiftLocked) {
-        self.shifted = NO;
-    }
+    self.shifted = NO;
 }
 
 #pragma mark -
@@ -475,13 +357,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 {
     _shifted = shifted;
     self.keyboardLayout.shifted = shifted;
-}
-
-- (void)setShiftLocked:(BOOL)shiftLocked
-{
-    _shiftLocked = shiftLocked;
-    _shifted = shiftLocked;
-    self.keyboardLayout.shiftLocked = shiftLocked;
 }
 
 #pragma mark -
