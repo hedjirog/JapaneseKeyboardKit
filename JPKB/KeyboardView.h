@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <ReactiveCocoa/ReactiveCocoa.h>
 #import "KeyboardLayout.h"
 
 @class KeyboardButton;
@@ -15,7 +16,6 @@
 
 @property (nonatomic, weak) id delegate;
 
-- (void)buttonDidTouchDown:(KeyboardButton *)button;
 - (void)buttonDidTouchUp:(KeyboardButton *)button;
 
 @end

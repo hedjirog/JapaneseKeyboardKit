@@ -115,7 +115,6 @@
 {
     NSArray *buttons = [self.inputButtons arrayByAddingObjectsFromArray:self.functionButtons];
     for (KeyboardButton *button in buttons) {
-        [button addTarget:view action:@selector(buttonDidTouchDown:) forControlEvents:UIControlEventTouchDown];
         [button addTarget:view action:@selector(buttonDidTouchUp:) forControlEvents:UIControlEventTouchUpInside];
         [view addSubview:button];
     }

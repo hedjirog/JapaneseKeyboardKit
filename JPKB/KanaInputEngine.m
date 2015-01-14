@@ -13,46 +13,58 @@
 @property (nonatomic) NSMutableString *proccessedText;
 @property (nonatomic) NSMutableString *displayText;
 
+@property (nonatomic) NSMutableString *buffer;
+
 @end
 
 @implementation KanaInputEngine
 
-- (instancetype)init
+- (instancetype)initWithInputSignal:(RACSignal *)inputSignal
 {
     self = [super init];
     if (self) {
         self.proccessedText = [[NSMutableString alloc] init];
         self.displayText = [[NSMutableString alloc] init];
+        
+        self.buffer = [[NSMutableString alloc] init];
+        
+        RACSignal *bufferedInputSignal = [inputSignal doNext:^(NSString *inputCharacter) {
+            [self.buffer appendString:inputCharacter];
+            NSLog(@"buffer: %@", self.buffer);
+        }];
+        
+        RACMulticastConnection *bufferedInputConnection = [bufferedInputSignal multicast:[RACReplaySubject subject]];
+        [bufferedInputConnection connect];
+        
+        RACSignal *vowelSignal = [[bufferedInputConnection.signal filter:^BOOL(NSString *inputCharacter) {
+            return [@[@"A", @"I", @"U", @"E", @"O"] containsObject:inputCharacter];
+        }] map:^(NSString *inputCharacter) {
+            NSMutableString *mutableBuffer = [[NSMutableString alloc] initWithString:self.buffer];
+            CFStringTransform((CFMutableStringRef)mutableBuffer, NULL, kCFStringTransformLatinHiragana, FALSE);
+            return [NSString stringWithString:mutableBuffer];
+        }];
+        
+        RACSignal *secondConsecutiveSignal = [[[bufferedInputConnection.signal combinePreviousWithStart:@"" reduce:^(NSString *previous, NSString *current) {
+            return [NSSet setWithArray:@[previous, current]];
+        }] filter:^BOOL(NSSet *characters) {
+            return [characters count] == 1;
+        }] map:^(NSSet *characters) {
+            NSString *consecutiveCharacter = [characters anyObject];
+            return ([consecutiveCharacter isEqualToString:@"N"]) ? @"ん" : @"っ";
+        }];
+        
+        RACSubject *transformedCharacter = [RACSubject subject];
+
+        [[[RACSignal merge:@[vowelSignal, secondConsecutiveSignal]] doNext:^(id _) {
+            self.buffer = [[NSMutableString alloc] init];
+        }] subscribe:transformedCharacter];
+        
+        [transformedCharacter subscribeNext:^(NSString *character) {
+            _displayText.string = character;
+            [self.delegate keyboardInputEngine:self processedText:_proccessedText.copy displayText:_displayText.copy];
+        }];
     }
     return self;
-}
-
-- (void)insertCharacter:(NSString *)input
-{
-    if ([input compare:@"A" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
-        [input compare:@"I" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
-        [input compare:@"U" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
-        [input compare:@"E" options:NSCaseInsensitiveSearch] == NSOrderedSame ||
-        [input compare:@"O" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-        [_displayText appendString:input];
-        
-        NSMutableString *kanaText = [[NSMutableString alloc] initWithString:_displayText];
-        CFStringTransform((CFMutableStringRef)kanaText, NULL, kCFStringTransformLatinHiragana, FALSE);
-        
-        _proccessedText.string = kanaText;
-        _displayText.string = kanaText;
-    } else if (_displayText.length > 0 && [[_displayText substringFromIndex:_displayText.length - 1] compare:input options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-        if ([input compare:@"N" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-            [_displayText replaceCharactersInRange:NSMakeRange(_displayText.length - 1, 1) withString:@"ん"];
-        } else {
-            [_displayText replaceCharactersInRange:NSMakeRange(_displayText.length - 1, 1) withString:@"っ"];
-            [_displayText appendString:input];
-        }
-    } else {
-        [_displayText appendString:input];
-    }
-    
-    [self.delegate keyboardInputEngine:self processedText:_proccessedText.copy displayText:_displayText.copy];
 }
 
 - (void)backspace

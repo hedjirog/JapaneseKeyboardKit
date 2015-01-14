@@ -7,7 +7,6 @@
 //
 
 #import "KeyboardView.h"
-#import <ReactiveCocoa/ReactiveCocoa.h>
 #import "KeyboardButton.h"
 #import "KeyboardCandidateBar.h"
 #import "KanaInputEngine.h"
@@ -56,7 +55,9 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.inputEngine = [[KanaInputEngine alloc] init];
+        RACSignal *inputSignal = [self inputSignal];
+        
+        self.inputEngine = [[KanaInputEngine alloc] initWithInputSignal:inputSignal];
         self.inputEngine.delegate = self;
         
         self.inputManager = [[InputManager alloc] init];
@@ -97,7 +98,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
         self.markedText = @"";
         
         [self setupKeyboardLayout];
-        [self setupEventSubscribers];
     }
     
     return self;
@@ -230,31 +230,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 
 #pragma mark -
 
-- (void)setupEventSubscribers
-{
-    RACSignal *kanaInputSignal = [self kanaInputSignal];
-    
-    [kanaInputSignal subscribeNext:^(NSString *input) {
-        [self.inputEngine insertCharacter:input];
-        [self resetShift];
-    }];
-}
-
-- (RACSignal *)kanaInputSignal
-{
-    RACSignal *signal = [self rac_signalForSelector:@selector(buttonDidTouchDown:)];
-    return [[[signal reduceEach:^(KeyboardButton *button){
-        return button;
-    }] filter:^BOOL(KeyboardButton *button) {
-        return button.keyIndex < KeyboardButtonIndexShift;
-    }] map:^(KeyboardButton *button) {
-        NSString *input = [button titleForState:UIControlStateNormal];
-        return (self.shifted) ? input.uppercaseString : input.lowercaseString;
-    }];
-}
-
-#pragma mark -
-
 - (void)setMarkedText:(NSString *)markedText
 {
     _markedText = markedText;
@@ -269,7 +244,20 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
 
 #pragma mark -
 
-- (void)buttonDidTouchDown:(KeyboardButton *)button
+- (RACSignal *)inputSignal
+{
+    RACSignal *signal = [self rac_signalForSelector:@selector(buttonDidTouchUp:)];
+    return [[[signal reduceEach:^(KeyboardButton *button){
+        return button;
+    }] filter:^BOOL(KeyboardButton *button) {
+        return button.keyIndex < KeyboardButtonIndexShift;
+    }] map:^(KeyboardButton *button) {
+        NSString *inputCharacter = [button titleForState:UIControlStateNormal];
+        return inputCharacter;
+    }];
+}
+
+- (void)buttonDidTouchUp:(KeyboardButton *)button
 {
     KeyboardButtonIndex keyIndex = button.keyIndex;
     switch (keyIndex) {
@@ -285,15 +273,6 @@ typedef NS_ENUM(NSInteger, KeyboardSize) {
             [self handleDelete];
             break;
             
-        default:
-            break;
-    }
-}
-
-- (void)buttonDidTouchUp:(KeyboardButton *)button
-{
-    KeyboardButtonIndex keyIndex = button.keyIndex;
-    switch (keyIndex) {
         case KeyboardButtonIndexReturn:
             [self handleReturn];
             break;

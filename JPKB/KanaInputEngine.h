@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <ReactiveCocoa/ReactiveCocoa.h>
 #import "KeyboardView.h"
 
 @interface KanaInputEngine : NSObject
@@ -15,7 +16,7 @@
 
 @property (nonatomic) NSString *text;
 
-- (void)insertCharacter:(NSString *)input;
+- (instancetype)initWithInputSignal:(RACSignal *)inputSignal;
 - (void)backspace;
 
 @end
